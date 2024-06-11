@@ -106,7 +106,10 @@
       }
 
       document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' && dino.y >= canvas.height - dino.height - 1) {
+        console.log('Key pressed:', e.code);
+        console.log('Dino Y position:', dino.y);
+        if (e.code === 'Space' && dino.y >= canvas.height - dino.height) {
+          console.log('Dino jumps');
           dino.dy = dino.jump;
         }
       });
