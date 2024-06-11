@@ -7,8 +7,8 @@
     <title>LongTaco</title>
     <style>
       html, body {
-        width: 100%;
         height: 100%;
+        width: 100%;
         margin: 0;
         display: flex;
         flex-direction: column;
@@ -20,7 +20,7 @@
       }
       body {
         border: 5px solid black;
-        box-sizing; border-box
+        box-sizing: border-box;
       }
       h1 {
         margin: 20px 0 10px 0;
@@ -28,10 +28,90 @@
       img {
         margin: 10px 0;
       }
+      canvas {
+        border: 1px solid black;
+        background-color: white;
+      }
     </style>
   </head>
   <body>
-      <h1>LongTaco.xyz</h1>
-      <img src="favicon.png" alt="Centered Image">
-    </body>
+    <h1>LongTaco.xyz</h1>
+    <img src="favicon.png" alt="Centered Image">
+    <canvas id="gameCanvas" width="800" height="200"></canvas>
+    <script>
+      const canvas = document.getElementById('gameCanvas');
+      const context = canvas.getContext('2d');
+
+      let dino = { x: 50, y: 150, width: 20, height: 20, dy: 0, jump: -5, gravity: 0.2 };
+      let obstacle = { x: canvas.width, y: canvas.height - 20, width: 20, height: 20, dx: -3 };
+      let score = 0;
+      let gameOver = false;
+
+      function drawDino() {
+        context.fillStyle = 'black';
+        context.fillRect(dino.x, dino.y, dino.width, dino.height);
+      }
+
+      function drawObstacle() {
+        context.fillStyle = 'red';
+        context.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      }
+
+      function drawScore() {
+        context.fillStyle = 'black';
+        context.font = '20px Arial';
+        context.fillText(`Score: ${score}`, 10, 20);
+      }
+
+      function update() {
+        if (gameOver) return;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Dino jump
+        if (dino.y + dino.height < canvas.height) {
+          dino.dy += dino.gravity;
+          dino.y += dino.dy;
+        } else {
+          dino.dy = 0;
+          dino.y = canvas.height - dino.height;
+        }
+
+        // Move obstacle
+        obstacle.x += obstacle.dx;
+
+        // Check collision
+        if (
+          dino.x < obstacle.x + obstacle.width &&
+          dino.x + dino.width > obstacle.x &&
+          dino.y < obstacle.y + obstacle.height &&
+          dino.y + dino.height > obstacle.y
+        ) {
+          gameOver = true;
+          alert(`Game Over! Your score: ${score}`);
+          document.location.reload();
+        }
+
+        // Reset obstacle position
+        if (obstacle.x + obstacle.width < 0) {
+          obstacle.x = canvas.width;
+          score++;
+        }
+
+        drawDino();
+        drawObstacle();
+        drawScore();
+
+        requestAnimationFrame(update);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && dino.y >= canvas.height - dino.height - 1) {
+          dino.dy = dino.jump;
+        }
+      });
+
+      update();
+    </script>
+  </body>
 </html>
