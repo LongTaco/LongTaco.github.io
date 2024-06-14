@@ -41,14 +41,6 @@
         border: 2px solid #000;
         margin: 20px auto; /* Center the game window horizontally */
     }
-      #player {
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        background-color: #ff0000;
-        top: 225px;
-        left: 225px;
-    }
     </style>
 
     
@@ -58,45 +50,7 @@
       <img src="favicon.png" alt="Centered Image">
       <p1>This is my first text written.</p1>
       <div id="gameWindow">
-      <div id="player"></div>
 </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const player = document.getElementById('player');
-            const gameWindow = document.getElementById('gameWindow');
-            const step = 10;
-
-            document.addEventListener('keydown', (e) => {
-                const playerRect = player.getBoundingClientRect();
-                const gameWindowRect = gameWindow.getBoundingClientRect();
-
-                switch (e.key) {
-                    case 'ArrowUp':
-                        if (playerRect.top > gameWindowRect.top) {
-                            player.style.top = `${player.offsetTop - step}px`;
-                        }
-                        break;
-                    case 'ArrowDown':
-                        if (playerRect.bottom < gameWindowRect.bottom) {
-                            player.style.top = `${player.offsetTop + step}px`;
-                        }
-                        break;
-                    case 'ArrowLeft':
-                        if (playerRect.left > gameWindowRect.left) {
-                            player.style.left = `${player.offsetLeft - step}px`;
-                        }
-                        break;
-                    case 'ArrowRight':
-                        if (playerRect.right < gameWindowRect.right) {
-                            player.style.left = `${player.offsetLeft + step}px`;
-                        }
-                        break;
-                }
-            });
-        });
-    </script>
-
-    
     </body>
 </html>
 
