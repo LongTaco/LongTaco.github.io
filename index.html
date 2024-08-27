@@ -36,12 +36,21 @@
         height: 150px;
       }
       img:hover {
-        width: 175px;
-        height: 175px;
+        animation: hoverAnimation 2s ease-out;
       }
      
-    </style>
+      @keyframes hoverAnimation{
+        from {
+          width: 150px;
+          height: 150px;
+        }
+        to {
+          width: 150px;
+          height: 150px;
+        }
+      }
 
+    </style>
     
   </head>
   <body>
