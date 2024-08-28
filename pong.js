@@ -11,24 +11,24 @@ function gameLoop() {
     byLoc += byVel;
 
     // Paddle collision
-    if (bxLoc + 60 >= pxLoc && bxLoc <= pxLoc + 150 && byLoc + 50 >= pyLoc && byLoc <= pyLoc + 20) {
+    if (bxLoc + 30 >= pxLoc && bxLoc <= pxLoc + 170 && byLoc + 20 >= pyLoc && byLoc <= pyLoc + 20) {
         byVel *= -1;
         byLoc -= 10;
         score += 1;
     }
 
     // Right Side
-    if (bxLoc > 430) {
+    if (bxLoc > 470) {
         bxVel *= -1;
     }
 
     // Left Side
-    if (bxLoc < 5) {
+    if (bxLoc < 25) {
         bxVel *= -1;
     }
 
     // Bottom Side
-    if (byLoc > 420) {
+    if (byLoc > 470) {
         resetBall();
         score = 0;
     }
@@ -55,8 +55,8 @@ function gameLoop() {
     ctx.fillRect(pxLoc, pyLoc, 150, 20);
 
     // Draw score
-    ctx.font = '40px Arial';
-    ctx.fillText(`The score is ${score}`, 10, 75);
+    ctx.font = '70px Arial';
+    ctx.fillText(`${score}`, 250, 75);
 
     requestAnimationFrame(gameLoop);
 }
