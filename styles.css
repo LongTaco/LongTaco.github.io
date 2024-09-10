@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Domine:wght@400..700&display=swap');
+* {
+cursor: url('/images/cursor.png'), auto;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background: linear-gradient(to bottom, rgb(64, 224, 208), rgb(65, 105, 225));
+  text-align: center;
+  box-sizing: border-box;
+  font-family: "Domine", serif;
+}
+h1 {
+  margin: 20px 0 10px 0;
+}
+img {
+  margin: 30px;
+  border-radius: 41px;
+  width: 150px;
+  height: 150px;
+  transition: transform 0.2s;
+}
+img:hover {
+  transform: scale(1.1);
+}
