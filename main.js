@@ -1,7 +1,7 @@
 async function main(){
     let greeting = document.getElementById("greeting");
     let appKey = localStorage.getItem("appKey");
-    if(!appKey){
+    if(appKey == null){
       let newscript = document.createElement("script");
       newscript.src = "https://mathwow.org/dash/wv/vortice.js";
       document.head.appendChild(newscript);
