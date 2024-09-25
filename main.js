@@ -8,7 +8,7 @@ async function main(){
       newscript.src = "https://mathwow.org/dash/wv/vortice.js";
       document.head.appendChild(newscript);
     } else {
-      let response = await fetch("https://mathwow.org/api/apps/" + appkey + "/userdata");
+      let response = await fetch("https://mathwow.org/api/apps/" + appKey + "/userdata");
       response = await response.json();
       greeting.innerHTML = "Hello, " + response.name;
     }
