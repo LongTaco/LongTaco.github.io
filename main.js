@@ -1,6 +1,8 @@
 async function main(){
     let greeting = document.getElementById("greeting");
     let appKey = localStorage.getItem("appKey");
+    let buton = document.getElementById("login-wv-button");
+    buton.setAttribute("data-callback", window.location.origin + "/callback")
     if(appKey == null){
       let newscript = document.createElement("script");
       newscript.src = "https://mathwow.org/dash/wv/vortice.js";
