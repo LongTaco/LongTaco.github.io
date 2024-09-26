@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #c8c8c8;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="1366" height="700"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let gravity = 2;
+        let boostScore = true;
+        let isRunning = true;
+        let start = false;
+
+        // Points
+        let point = {x: 1000, y: 565, width: 20, height: 20};
+        let score = 0;
+
+        // Enemy variables
+        let initialEnemyVel = 7;
+        let enemies = [
+            {x: 800, y: 500, width: 50, height: 100, velX: initialEnemyVel},
+            {x: 700, y: 500, width: 50, height: 100, velX: initialEnemyVel * -1},
+            {x: 600, y: 500, width: 50, height: 100, velX: initialEnemyVel * 0.75}
+        ];
+
+        // Player variables
+        let player = {x: 100, y: 550, width: 50, height: 50, speed: 7, jump: 25, velX: 0, velY: 0};
+        let isJumping = false;
+        let collideRight = false;
+        let collideLeft = false;
+
+        // Keyboard events
+        document.addEventListener('keydown', (e) => {
+            if (!start) start = true;
+            if (!isRunning) return;
+            
+            if (e.keyCode === 32 || e.keyCode === 38) { // Space or Up Arrow
+                if (!isJumping) {
+                    isJumping = true;
+                    player.velY = -player.jump;
+                }
+            }
+            if (e.keyCode === 37 && !collideLeft) { // Left Arrow
+                player.velX = -10;
+            }
+            if (e.keyCode === 39 && !collideRight) { // Right Arrow
+                player.velX = 10;
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.keyCode === 37 || e.keyCode === 39) { // Stop movement on key release
+                player.velX = 0;
+            }
+            if (e.keyCode === 27) { // Pause on ESC
+                isRunning = !isRunning;
+            }
+        });
+
+        function gameLoop() {
+            if (isRunning && start) {
+                // Player movement
+                player.velY += gravity;
+                player.y += player.velY;
+                player.x += player.velX;
+
+                // Player collision with walls
+                if (player.x >= 1316) {
+                    collideRight = true;
+                    player.x = 1316;
+                } else {
+                    collideRight = false;
+                }
+                if (player.x <= 0) {
+                    collideLeft = true;
+                    player.x = 0;
+                } else {
+                    collideLeft = false;
+                }
+
+                // Floor collision
+                if (player.y >= 550) {
+                    player.y = 550;
+                    player.velY = 0;
+                    isJumping = false;
+                }
+
+                // Enemy movement
+                enemies.forEach((enemy) => {
+                    enemy.x += enemy.velX;
+                    if (enemy.x < 0 || enemy.x > 1316) {
+                        enemy.velX *= -1;
+                    }
+
+                    // Enemy collision
+                    if (rectCollision(player, enemy)) {
+                        score = 0;
+                        resetGame();
+                    }
+                });
+
+                // Point collection
+                if (rectCollision(player, point)) {
+                    score++;
+                    point.x = Math.floor(Math.random() * 1366);
+                    boostScore = true;
+                }
+
+                // Increase enemy speed
+                if (score % 5 === 0 && score !== 0 && boostScore) {
+                    boostScore = false;
+                    enemies.forEach((enemy) => {
+                        enemy.velX += enemy.velX * 0.1;
+                    });
+                }
+            }
+
+            // Draw everything
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function resetGame() {
+            player.x = 100;
+            player.y = 550;
+            enemies[0].x = 800;
+            enemies[1].x = 700;
+            enemies[2].x = 600;
+            enemies[0].velX = initialEnemyVel;
+            enemies[1].velX = initialEnemyVel * -1;
+            enemies[2].velX = initialEnemyVel * 0.75;
+            point.x = Math.floor(Math.random() * 1366);
+            start = false;
+        }
+
+        function rectCollision(r1, r2) {
+            return r1.x < r2.x + r2.width &&
+                   r1.x + r1.width > r2.x &&
+                   r1.y < r2.y + r2.height &&
+                   r1.y + r1.height > r2.y;
+        }
+
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Background
+            ctx.fillStyle = '#c8c8c8';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Ground
+            ctx.fillStyle = '#969696';
+            ctx.fillRect(0, 600, 1400, 100);
+
+            // Draw player
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // Draw enemies
+            enemies.forEach((enemy) => {
+                ctx.fillStyle = '#c46262';
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            });
+
+            // Draw point
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(point.x, point.y, point.width, point.height);
+
+            // Draw score
+            ctx.fillStyle = '#000000';
+            ctx.font = '30px Arial';
+            ctx.fillText('Score: ' + score, 20, 50);
+
+            // Pause and start messages
+            if (!isRunning) {
+                ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#000000';
+                ctx.font = '75px Arial';
+                ctx.fillText('PAUSED', 520, 300);
+            }
+            if (!start) {
+                ctx.fillStyle = '#000000';
+                ctx.font = '40px Arial';
+                ctx.fillText('Press any key to start', 475, 150);
+            }
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
