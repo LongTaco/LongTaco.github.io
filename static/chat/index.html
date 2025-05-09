@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longtaco chat</title>
+</head>
+
+<body>
+
+    <h1 id="username"></h1>
+
+    <input type="text" id="recipient" placeholder="Recipient">
+    <input type="text" id="message" placeholder="Messsage">
+    <button id="send">Send</button>
+
+    <script>
+        let ws;
+        let messages = {};
+        let username = localStorage.getItem("username") || prompt("Username:");
+        localStorage.setItem("username", username);
+        document.getElementById("username").innerText = "Your username: " + username;
+        ws = new WebSocket("/ws/" + username);
+        ws.onmessage = function (event) {
+            let msg = JSON.parse(event.data);
+            if (messages[msg.from]) {
+                messages[msg.from].push(msg.message);
+            } else {
+                messages[msg.from] = [msg.message];
+            }
+            let msgText = document.createElement("p");
+            msgText.innerText = msg.from + ": " + msg.message;
+            document.body.appendChild(msgText);
+            console.log("From ws: " + event.data);
+        }
+        ws.onready = function () {
+            ws.send("ECHO");
+        }
+        document.getElementById("send").addEventListener("click", function () {
+            let ms = document.getElementById("message").value;
+            let res = document.getElementById("recipient").value;
+
+            let msgText = document.createElement("p");
+            msgText.innerText = username + ": " + ms;
+            document.body.appendChild(msgText);
+
+            ws.send(JSON.stringify({ to: res, message: ms }));
+            document.getElementById("message").value = "";
+        });
+    </script>
+</body>
+
+</html>
