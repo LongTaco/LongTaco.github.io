@@ -8,6 +8,48 @@
     <meta name="description" content="A sleek, modern homepage to launch your HTML games." />
     <link rel="icon" href="images/logoIcon.png" />
     <style>
+        .dev-console {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: grid;
+            place-items: center;
+            z-index: 1000;
+        }
+
+        .console-inner {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px;
+            width: min(400px, 90%);
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 14px;
+        }
+
+        .console-inner h2 {
+            margin: 0 0 10px;
+        }
+
+        .console-inner form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .console-inner label {
+            display: grid;
+            gap: 4px;
+            font-size: 14px;
+        }
+
+        .console-inner input {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid color-mix(in oklab, var(--card), transparent 65%);
+            background: var(--bg-soft);
+            color: var(--text);
+        }
+
         :root {
             --bg: #0b0f14;
             --bg-soft: #0f151c;
@@ -339,6 +381,37 @@
     </style>
 </head>
 
+<!-- Dev Console (hidden by default) -->
+<div id="devConsole" class="dev-console" hidden>
+    <div class="console-inner">
+        <h2>Dev Console</h2>
+        <form id="devForm">
+            <label>
+                Title
+                <input name="title" required>
+            </label>
+            <label>
+                Path (e.g. /play/my-game/)
+                <input name="path" required>
+            </label>
+            <label>
+                Description
+                <input name="desc">
+            </label>
+            <label>
+                Tags (comma-separated)
+                <input name="tags">
+            </label>
+            <label>
+                Image URL (optional)
+                <input name="img">
+            </label>
+            <button type="submit" class="btn">Add Game</button>
+            <button type="button" id="closeConsole" class="btn secondary">Close</button>
+        </form>
+    </div>
+</div>
+
 <body>
     <div class="wrap">
         <header>
@@ -493,6 +566,67 @@
 
             render();
         }
+
+        // --- Dev Console Logic ---
+        const devConsole = document.getElementById("devConsole");
+        const devForm = document.getElementById("devForm");
+        const closeBtn = document.getElementById("closeConsole");
+
+        function openConsole() {
+            devConsole.hidden = false;
+        }
+        function closeConsole() {
+            devConsole.hidden = true;
+        }
+
+        // Toggle console with Ctrl+D
+        window.addEventListener("keydown", (e) => {
+            if (e.ctrlKey && e.key.toLowerCase() === "d") {
+                e.preventDefault();
+                openConsole();
+            }
+        });
+
+        closeBtn.addEventListener("click", closeConsole);
+
+        // Submit form → POST to backend
+        devForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(devForm);
+            const game = {
+                title: formData.get("title"),
+                path: formData.get("path"),
+                desc: formData.get("desc"),
+                tags: formData.get("tags")
+                    .split(",")
+                    .map(t => t.trim())
+                    .filter(Boolean),
+                img: formData.get("img")
+            };
+
+            try {
+                const res = await fetch("https://<your-backend>.onrender.com/games", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(game)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert("Game added!");
+                    devForm.reset();
+                    closeConsole();
+                    // Re-render the grid with new data
+                    els.q.value = ""; // reset search
+                    const list = await tryLoadExternal();
+                    els.grid.replaceChildren(...list.map(gameCard));
+                    els.count.textContent = list.length;
+                } else {
+                    alert("Error: " + (data.error || "Unknown"));
+                }
+            } catch (err) {
+                alert("Failed to connect to backend.");
+            }
+        });
 
         init();
     </script>
