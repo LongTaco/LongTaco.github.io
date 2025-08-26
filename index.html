@@ -403,10 +403,9 @@
         // If /games.json exists, it will override GAMES.
         async function tryLoadExternal() {
             try {
-                const res = await fetch('/games.json', { cache: 'no-store' });
+                const res = await fetch("https://longtaco-github-io.onrender.com/games");
                 if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data) && data.length) return data;
+                    return await res.json();
                 }
             } catch (e) { }
             return GAMES;
