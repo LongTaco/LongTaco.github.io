@@ -34582,7 +34582,6 @@ function _u31() {
     function _b41(_c41) {
         if (!_c41) {
             console.log("Assertion failed! Pls debug.");
-            debugger
         }
     }
     var _d41 = Number.MAX_VALUE;
