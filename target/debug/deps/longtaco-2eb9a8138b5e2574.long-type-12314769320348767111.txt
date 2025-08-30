@@ -1,0 +1,1 @@
+actix_web::HttpServer<{closure@src/main.rs:6:21: 6:28}, actix_web::App<actix_web::app_service::AppEntry>, actix_web::app_service::AppInit<actix_web::app_service::AppEntry, actix_web::body::BoxBody>, actix_web::body::BoxBody>

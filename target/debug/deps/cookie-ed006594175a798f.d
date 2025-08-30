@@ -1,0 +1,11 @@
+/Users/trignomtry/dev/LongTaco.github.io/target/debug/deps/cookie-ed006594175a798f.d: /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/lib.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/builder.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/parse.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/jar.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/delta.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/draft.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/expiration.rs
+
+/Users/trignomtry/dev/LongTaco.github.io/target/debug/deps/libcookie-ed006594175a798f.rmeta: /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/lib.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/builder.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/parse.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/jar.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/delta.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/draft.rs /Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/expiration.rs
+
+/Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/lib.rs:
+/Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/builder.rs:
+/Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/parse.rs:
+/Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/jar.rs:
+/Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/delta.rs:
+/Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/draft.rs:
+/Users/trignomtry/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cookie-0.16.2/src/expiration.rs:

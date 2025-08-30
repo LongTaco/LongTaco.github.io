@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LongTaco.xyz</title>
+    <meta name="description" content="A sleek, modern homepage to launch your HTML games." />
+    <link rel="icon" href="images/logoIcon.png" />
+    <style>
+        .dev-console {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: grid;
+            place-items: center;
+            z-index: 1000;
+        }
+
+        .console-inner {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px;
+            width: min(400px, 90%);
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 14px;
+        }
+
+        .console-inner h2 {
+            margin: 0 0 10px;
+        }
+
+        .console-inner form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .console-inner label {
+            display: grid;
+            gap: 4px;
+            font-size: 14px;
+        }
+
+        .console-inner input {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid color-mix(in oklab, var(--card), transparent 65%);
+            background: var(--bg-soft);
+            color: var(--text);
+        }
+
+        :root {
+            --bg: #0b0f14;
+            --bg-soft: #0f151c;
+            --card: #121924;
+            --text: #e7eef7;
+            --muted: #9db2c7;
+            --accent: #4ea4ff;
+            --accent-2: #7cffd4;
+            --ring: rgba(78, 164, 255, 0.6);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            --radius: 18px;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f7f9fc;
+                --bg-soft: #f1f5fb;
+                --card: #ffffff;
+                --text: #0c111a;
+                --muted: #506070;
+                --accent: #2563eb;
+                --accent-2: #06b6d4;
+                --ring: rgba(37, 99, 235, 0.35);
+                --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        [data-theme="dark"] {
+            --bg: #0b0f14;
+            --bg-soft: #0f151c;
+            --card: #121924;
+            --text: #e7eef7;
+            --muted: #9db2c7;
+            --accent: #4ea4ff;
+            --accent-2: #7cffd4;
+            --ring: rgba(78, 164, 255, 0.6);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        [data-theme="light"] {
+            --bg: #f7f9fc;
+            --bg-soft: #f1f5fb;
+            --card: #ffffff;
+            --text: #0c111a;
+            --muted: #506070;
+            --accent: #2563eb;
+            --accent-2: #06b6d4;
+            --ring: rgba(37, 99, 235, 0.35);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+            background: radial-gradient(1000px 600px at 80% -20%, rgba(78, 164, 255, .18), transparent),
+                radial-gradient(900px 500px at -10% 0%, rgba(124, 255, 212, .15), transparent),
+                var(--bg);
+            color: var(--text);
+            letter-spacing: .2px;
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+        }
+
+        header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand .logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: var(--shadow);
+            display: grid;
+            place-items: center;
+            color: white;
+            font-weight: 900;
+            letter-spacing: .5px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: clamp(20px, 3vw, 28px);
+        }
+
+        .brand p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            background: color-mix(in oklab, var(--bg-soft) 80%, transparent);
+            border: 1px solid color-mix(in oklab, var(--card), transparent 70%);
+            padding: 10px;
+            border-radius: calc(var(--radius) + 6px);
+            box-shadow: var(--shadow);
+        }
+
+        .search {
+            position: relative;
+        }
+
+        .search input {
+            width: 100%;
+            padding: 12px 40px 12px 40px;
+            border-radius: 14px;
+            border: 1px solid color-mix(in oklab, var(--card), transparent 65%);
+            background: var(--card);
+            color: var(--text);
+            outline: none;
+            box-shadow: inset 0 0 0 1px transparent, var(--shadow);
+        }
+
+        .search svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: .6;
+        }
+
+        .search kbd {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: var(--muted);
+            background: var(--bg-soft);
+            border: 1px solid color-mix(in oklab, var(--card), transparent 70%);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+
+        .select,
+        .sort,
+        .theme {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: var(--card);
+            border: 1px solid color-mix(in oklab, var(--card), transparent 65%);
+            box-shadow: var(--shadow);
+        }
+
+        .select select,
+        .sort select {
+            background: transparent;
+            color: var(--text);
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .card {
+            position: relative;
+            background: var(--card);
+            border: 1px solid color-mix(in oklab, var(--card), transparent 60%);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: color-mix(in oklab, var(--accent), black 15%);
+        }
+
+        .thumb {
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, color-mix(in oklab, var(--accent), transparent 60%), color-mix(in oklab, var(--accent-2), transparent 60%));
+            display: grid;
+            place-items: center;
+        }
+
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .thumb .fallback {
+            font-weight: 800;
+            font-size: 28px;
+            opacity: .85;
+        }
+
+        .content {
+            padding: 14px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .title {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 8px;
+        }
+
+        .title h3 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: color-mix(in oklab, var(--accent), transparent 85%);
+            color: color-mix(in oklab, var(--accent), black 40%);
+            border: 1px solid color-mix(in oklab, var(--accent), transparent 60%);
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            appearance: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: .2px;
+            background: linear-gradient(180deg, color-mix(in oklab, var(--accent), white 10%), color-mix(in oklab, var(--accent), black 8%));
+            color: white;
+            box-shadow: 0 6px 14px var(--ring);
+        }
+
+        .btn.secondary {
+            background: color-mix(in oklab, var(--card), transparent 0%);
+            color: var(--text);
+            border: 1px solid color-mix(in oklab, var(--card), transparent 65%);
+            box-shadow: none;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 16px;
+            color: var(--muted);
+        }
+
+        footer {
+            margin-top: 28px;
+            color: var(--muted);
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hint {
+            background: var(--card);
+            border: 1px dashed color-mix(in oklab, var(--card), transparent 55%);
+            border-radius: 14px;
+            padding: 10px 12px;
+        }
+
+        .count {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        @media (max-width: 640px) {
+            header {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<!-- Dev Console (hidden by default) -->
+<div id="devConsole" class="dev-console hidden">
+    <div class="console-inner">
+        <h2>Dev Console</h2>
+        <form id="devForm">
+            <label>
+                Title
+                <input name="title" required>
+            </label>
+            <input type="file" id="zip-file" accept=".zip" />
+            <label>
+                Description
+                <input name="desc">
+            </label>
+            <label>
+                Tags (comma-separated)
+                <input name="tags">
+            </label>
+
+            <label>
+                Password
+                <input name="pw" required>
+            </label>
+
+            <button type="submit" class="btn">Add Game</button>
+            <button type="button" id="closeConsole" class="btn secondary">Close</button>
+        </form>
+    </div>
+</div>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div class="brand">
+                <div class="logo" aria-hidden>GH</div>
+                <div>
+                    <h1>LongTaco.xyz</h1>
+                </div>
+            </div>
+            <div class="theme" role="group" aria-label="Theme toggle">
+                <button class="btn secondary" id="toggleTheme" title="Toggle theme">Toggle theme</button>
+            </div>
+        </header>
+
+        <div class="toolbar" role="search" aria-label="Game filters">
+            <div class="search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden>
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input id="q" placeholder="Search games (press /)" autocomplete="off" />
+                <kbd>/</kbd>
+            </div>
+            <div class="select">
+                <label for="tag">Tag</label>
+                <select id="tag"></select>
+            </div>
+            <div class="sort">
+                <label for="sort">Sort</label>
+                <select id="sort">
+                    <option value="az">A → Z</option>
+                    <option value="new">Recently added</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="grid" class="grid" aria-live="polite"></div>
+        <div id="empty" class="empty" hidden>No games match your filters.</div>
+
+        <footer>
+            <div class="hint">Tip: each game should live at <code>/play/&lt;folder&gt;/index.html</code> with an
+                optional cover image <code>cover.png</code>.</div>
+            <div><span class="count" id="count">0</span> games</div>
+            <button onclick="openDevConsole()">Open Dev Console</button>
+        </footer>
+    </div>
+
+    <script>
+        function openDevConsole() {
+            let devConsole = document.getElementById("devConsole");
+            devConsole.classList.remove("hidden");
+        }
+
+        async function tryLoadExternal() {
+            try {
+                const res = await fetch("/games");
+                if (res.ok) {
+                    return await res.json();
+                }
+            } catch (e) { console.log("Error getting games", e); }
+            return [];
+        }
+
+        // --- Theme ---
+        const root = document.documentElement;
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') root.setAttribute('data-theme', savedTheme);
+        document.getElementById('toggleTheme').addEventListener('click', () => {
+            const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+        });
+
+        // --- UI state ---
+        const els = {
+            q: document.getElementById('q'),
+            tag: document.getElementById('tag'),
+            sort: document.getElementById('sort'),
+            grid: document.getElementById('grid'),
+            empty: document.getElementById('empty'),
+            count: document.getElementById('count'),
+        };
+
+        function uniqueTags(list) {
+            const set = new Set();
+            list.forEach(g => (g.tags || []).forEach(t => set.add(t)));
+            return ['all', ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+        }
+
+        function gameCard(g) {
+            const a = document.createElement('article');
+            a.className = 'card';
+            a.innerHTML = `
+          <div class="thumb">
+            <img alt="${g.title} cover" loading="lazy" src="${g.img || g.path + 'cover.png'}" onerror="this.remove(); this.parentElement.insertAdjacentHTML('beforeend', '<div class=\'fallback\'>${g.title.split(' ').map(w => w[0]).join('').slice(0, 3)}</div>')" />
+          </div>
+          <div class="content">
+            <div class="title">
+              <h3>${g.title}</h3>
+            </div>
+            <div class="meta">${g.desc || ''}</div>
+            <div class="tags">${(g.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
+            <div class="actions">
+              <a class="btn" href="${g.path}" target="_blank" rel="noopener">Play</a>
+            </div>
+          </div>`;
+            return a;
+        }
+
+        function applyFilters(list) {
+            const q = els.q.value.trim().toLowerCase();
+            const tag = els.tag.value;
+            const s = els.sort.value;
+            let out = list.filter(g => {
+                const inQ = !q || g.title.toLowerCase().includes(q) || (g.desc || '').toLowerCase().includes(q) || (g.tags || []).some(t => t.toLowerCase().includes(q));
+                const inTag = tag === 'all' || (g.tags || []).includes(tag);
+                return inQ && inTag;
+            });
+            if (s === 'az') out.sort((a, b) => a.title.localeCompare(b.title));
+            else if (s === 'new') out.sort((a, b) => new Date(b.added || 0) - new Date(a.added || 0));
+            return out;
+        }
+
+        async function init() {
+            const data = await tryLoadExternal();
+            // Populate tag dropdown
+            const tags = uniqueTags(data);
+            els.tag.innerHTML = tags.map(t => `<option value="${t}">${t[0].toUpperCase()}${t.slice(1)}</option>`).join('');
+
+            function render() {
+                const list = applyFilters(data);
+                els.grid.replaceChildren(...list.map(gameCard));
+                els.empty.hidden = list.length > 0;
+                els.count.textContent = list.length;
+            }
+
+            // Wire controls
+            els.q.addEventListener('input', render);
+            els.tag.addEventListener('change', render);
+            els.sort.addEventListener('change', render);
+            window.addEventListener('keydown', (e) => { if (e.key === '/' && document.activeElement !== els.q) { e.preventDefault(); els.q.focus(); } });
+
+            render();
+        }
+
+        // --- Dev Console Logic ---
+        const devConsole = document.getElementById("devConsole");
+        const devForm = document.getElementById("devForm");
+        const closeBtn = document.getElementById("closeConsole");
+
+        function closeConsole() {
+            devConsole.classList.add("hidden");
+        }
+
+        closeBtn.addEventListener("click", closeConsole);
+
+        // Submit form → POST to backend
+        devForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(devForm);
+            const fileInput = document.getElementById('zip-file');
+            const file = fileInput.files[0];
+
+            if (file) formData.append('file', file);
+            const game = {
+                title: formData.get("title"),
+                desc: formData.get("desc"),
+                tags: formData.get("tags")
+                    .split(",")
+                    .map(t => t.trim())
+                    .filter(Boolean),
+                img: formData.get("img"),
+                pw: formData.get("pw"),
+            };
+            // Include metadata as JSON in the multipart payload
+            formData.set('meta', JSON.stringify(game));
+
+            try {
+                const res = await fetch("/games", {
+                    method: "POST",
+                    // Let the browser set multipart/form-data with boundary automatically
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert("Game added!");
+                    devForm.reset();
+                    closeConsole();
+                    // Re-render the grid with new data
+                    els.q.value = ""; // reset search
+                    const list = await tryLoadExternal();
+                    els.grid.replaceChildren(...list.map(gameCard));
+                    els.count.textContent = list.length;
+                } else {
+                    alert("Error: " + (data.error || "Unknown"));
+                }
+            } catch (err) {
+                alert("Failed to connect to backend.");
+            }
+        });
+
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+[
+    {
+        "added": "2024-06-01",
+        "desc": "Sling, smash, upgrade, repeat.",
+        "id": "burrito-bison",
+        "img": "images/burritoBisonIcon.png",
+        "path": "/play/burrito-bison/",
+        "tags": [
+            "arcade",
+            "clicker"
+        ],
+        "title": "Burrito Bison"
+    },
+    {
+        "added": "2024-06-03",
+        "desc": "Low-poly racing challenge.",
+        "id": "polytrack",
+        "img": "images/polytrackIcon.png",
+        "path": "/play/polytrack/",
+        "tags": [
+            "racing"
+        ],
+        "title": "Polytrack"
+    },
+    {
+        "added": "2024-06-05",
+        "desc": "Endless downhill reflex test.",
+        "id": "slope",
+        "img": "images/slopeIcon.png",
+        "path": "/play/slope/",
+        "tags": [
+            "endless",
+            "skill"
+        ],
+        "title": "Slope"
+    },
+    {
+        "added": "2024-06-06",
+        "desc": "Carve the snowy course.",
+        "id": "snowrider",
+        "img": "images/snowriderIcon.png",
+        "path": "/play/snowrider/",
+        "tags": [
+            "sports",
+            "endless"
+        ],
+        "title": "Snow Rider"
+    },
+    {
+        "added": "2024-06-07",
+        "desc": "Neon maze runner.",
+        "id": "tomb-of-the-mask",
+        "img": "images/tombIcon.png",
+        "path": "/play/tomb-of-the-mask/",
+        "tags": [
+            "arcade",
+            "puzzle"
+        ],
+        "title": "Tomb of the Mask"
+    }
+]
