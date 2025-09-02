@@ -140,10 +140,10 @@
             gap: 12px;
         }
 
-        .brand .logo {
+        .brand .logo img {
             width: 42px;
             height: 42px;
-            border-radius: 12px;
+            border-radius: 8px;
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             box-shadow: var(--shadow);
             display: grid;
@@ -151,6 +151,7 @@
             color: white;
             font-weight: 900;
             letter-spacing: .5px;
+            border:none;
         }
 
         .brand h1 {
@@ -419,7 +420,7 @@
     <div class="wrap">
         <header>
             <div class="brand">
-                <div class="logo" aria-hidden>GH</div>
+                <div class="logo" aria-hidden><img src="./images/logoIcon.png" alt=""></div>
                 <div>
                     <h1>LongTaco.xyz</h1>
                 </div>
@@ -456,8 +457,6 @@
         <div id="empty" class="empty" hidden>No games match your filters.</div>
 
         <footer>
-            <div class="hint">Tip: each game should live at <code>/play/&lt;folder&gt;/index.html</code> with an
-                optional cover image <code>cover.png</code>.</div>
             <div><span class="count" id="count">0</span> games</div>
             <button onclick="openDevConsole()">Open Dev Console</button>
         </footer>
