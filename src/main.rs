@@ -105,8 +105,11 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                     continue;
                 };
 
-                // Destination path on disk
-                let path = Path::new(&format!("{}/play/{filename}/", STATIC_DIR)).join(&rel_path);
+                // Remove the first path component to flatten top-level folders
+                let mut comps = rel_path.components();
+                let _ = comps.next();
+                let flattened: std::path::PathBuf = comps.collect();
+                let path = Path::new(&format!("{}/play/{filename}/", STATIC_DIR)).join(&flattened);
                 if entry.name().contains("__MACOSX") {
                 } else if entry.name().ends_with('/') {
                     std::fs::create_dir_all(path.display().to_string().trim_end_matches("/"))?;
@@ -118,16 +121,16 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                     std::io::copy(&mut entry, &mut outfile)?;
 
                     // Detect important files relative to archive root
-                    if let Some(fname) = rel_path.file_name().and_then(|s| s.to_str()) {
+                    if let Some(fname) = flattened.file_name().and_then(|s| s.to_str()) {
                         if fname.eq_ignore_ascii_case("index.html") {
                             // Save directory (may be empty if at root)
-                            let dir = rel_path
+                            let dir = flattened
                                 .parent()
                                 .map(|p| p.to_string_lossy().to_string())
                                 .unwrap_or_else(|| "".to_string());
                             index_rel_dir = Some(dir);
                         } else if fname.eq_ignore_ascii_case("image.png") {
-                            let rel = rel_path.to_string_lossy().to_string();
+                            let rel = flattened.to_string_lossy().to_string();
                             img_rel_path = Some(rel);
                         }
                     }
