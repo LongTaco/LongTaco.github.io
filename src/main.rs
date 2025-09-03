@@ -152,27 +152,9 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
         .await;
 
     // Compute the final paths to store in metadata based on what we found
-    let (detected_subdir, detected_img_rel) = match unzip_result {
-        Ok(Ok((subdir, img_rel))) => (subdir, img_rel),
-        Ok(Err(e)) => {
-            eprintln!("Error extracting zip: {e}");
-            return HttpResponse::InternalServerError()
-                .json(json!({"error": format!("Failed to extract archive: {e}")}));
-        }
-        Err(e) => {
-            eprintln!("Join error extracting zip: {e}");
-            return HttpResponse::InternalServerError()
-                .json(json!({"error": "Extraction task failed"}));
-        }
-    };
-
-    // Build game metadata using detected locations
-    let base_web_path = if detected_subdir.is_empty() {
-        format!("/play/{fname}/")
-    } else {
-        format!("/play/{fname}/{detected_subdir}/")
-    };
-    let img_web_path = format!("/play/{fname}/{detected_img_rel}");
+    // Always flatten paths after extraction
+    let base_web_path = format!("/play/{fname}/");
+    let img_web_path = format!("/play/{fname}/image.png");
 
     let game_data = match meta {
         Some(mut v) => {
