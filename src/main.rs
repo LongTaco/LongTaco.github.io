@@ -33,7 +33,8 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
         .take(10)
         .map(char::from)
         .collect();
-        let upload_path = format!("{}/{}.zip", UPLOADS_DIR, filename);    let mut file = match tokio::fs::File::create(&upload_path).await {
+    let upload_path = format!("{UPLOADS_DIR}/{filename}.zip");
+    let mut file = match tokio::fs::File::create(&upload_path).await {
         Ok(f) => f,
         Err(e) => {
             eprintln!("Failed to create upload file: {e}");
@@ -79,7 +80,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
     }
     drop(file);
 
-    std::fs::create_dir_all(format!("{}/play/{filename}", STATIC_DIR)).unwrap();   
+    std::fs::create_dir_all(format!("{}/play/{filename}", STATIC_DIR)).unwrap();
 
     // Extract the zip in a single blocking task to avoid lifetime issues
     // Also detect where index.html and image.png live (root or single folder)
@@ -176,12 +177,18 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                 Some(o) => {
                     if let Some(name) = game_data.get("name").and_then(|n| n.as_str()) {
                         // Remove old metadata entries with the same name
-                        if let Some(old) = o.iter().find(|g| g.get("name").and_then(|n| n.as_str()) == Some(name)) {
+                        if let Some(old) = o
+                            .iter()
+                            .find(|g| g.get("name").and_then(|n| n.as_str()) == Some(name))
+                        {
                             if let Some(old_path) = old.get("path").and_then(|p| p.as_str()) {
                                 // Derive absolute folder path from old_path
                                 let abs_path = format!("{}{}", STATIC_DIR, old_path);
                                 if let Err(e) = std::fs::remove_dir_all(&abs_path) {
-                                    eprintln!("Failed to delete old game folder {}: {}", abs_path, e);
+                                    eprintln!(
+                                        "Failed to delete old game folder {}: {}",
+                                        abs_path, e
+                                    );
                                 }
                             }
                         }
@@ -221,11 +228,8 @@ async fn main() -> Result<(), std::io::Error> {
             .service(games_json)
             .service(add_game)
             .service(actix_files::Files::new("/", "./static").index_file("index.html"))
-            .service(
-                actix_files::Files::new("/play", format!("{}/play", STATIC_DIR))
-                     .index_file("index.html")
-            )
-        })
+            .service(actix_files::Files::new("/", STATIC_DIR).index_file("index.html"))
+    })
     .bind(("0.0.0.0", 8080))?
     .run()
     .await
