@@ -174,6 +174,19 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
         Ok(r) => match serde_json::from_str::<Value>(&r) {
             Ok(mut l) => match l.as_array_mut() {
                 Some(o) => {
+                    if let Some(name) = game_data.get("name").and_then(|n| n.as_str()) {
+                        // Remove old metadata entries with the same name
+                        if let Some(old) = o.iter().find(|g| g.get("name").and_then(|n| n.as_str()) == Some(name)) {
+                            if let Some(old_path) = old.get("path").and_then(|p| p.as_str()) {
+                                // Derive absolute folder path from old_path
+                                let abs_path = format!("{}{}", STATIC_DIR, old_path);
+                                if let Err(e) = std::fs::remove_dir_all(&abs_path) {
+                                    eprintln!("Failed to delete old game folder {}: {}", abs_path, e);
+                                }
+                            }
+                        }
+                        o.retain(|g| g.get("name").and_then(|n| n.as_str()) != Some(name));
+                    }
                     o.push(game_data);
                     o.clone()
                 }
