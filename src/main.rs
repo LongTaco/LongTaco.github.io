@@ -223,7 +223,10 @@ async fn main() -> Result<(), std::io::Error> {
             .service(games_json)
             .service(add_game)
             .service(actix_files::Files::new("/", "./static").index_file("index.html"))
-            .service(actix_files::Files::new("/play", format!("{}/play", STATIC_DIR)))
+            .service(
+                actix_files::Files::new("/play", format!("{}/play", STATIC_DIR))
+                     .index_file("index.html")
+            )
         })
     .bind(("0.0.0.0", 8080))?
     .run()
