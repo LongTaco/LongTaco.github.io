@@ -222,7 +222,9 @@ async fn main() -> Result<(), std::io::Error> {
             .app_data(web::PayloadConfig::default().limit(100 * 1024 * 1024))
             .service(games_json)
             .service(add_game)
-            .service(actix_files::Files::new("/", "./static").index_file("index.html"))})
+            .service(actix_files::Files::new("/", "./static").index_file("index.html"))
+            .service(actix_files::Files::new("/play", format!("{}/play", STATIC_DIR)))
+        })
     .bind(("0.0.0.0", 8080))?
     .run()
     .await
