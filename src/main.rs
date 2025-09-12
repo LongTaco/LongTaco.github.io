@@ -93,12 +93,8 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
             let mut img_rel_path: Option<String> = None;
 
             for ind in 0..zip.len() {
-                let mut entry = zip
-                    .by_index(ind)
-                    .map_err(|e| std::io::Error::other(e.to_string()))?;
-                let Some(rel_path) = entry.enclosed_name().map(|p| p.to_path_buf()) else {
-                    continue;
-                };
+                let mut entry = zip.by_index(ind).map_err(|e| std::io::Error::other(e.to_string()))?;
+                let Some(rel_path) = entry.enclosed_name().map(|p| p.to_path_buf()) else { continue; };
                 let mut comps = rel_path.components();
                 let _ = comps.next();
                 let flattened: std::path::PathBuf = comps.collect();
@@ -116,10 +112,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
 
                     if let Some(fname) = flattened.file_name().and_then(|s| s.to_str()) {
                         if fname.eq_ignore_ascii_case("index.html") {
-                            let dir = flattened
-                                .parent()
-                                .map(|p| p.to_string_lossy().to_string())
-                                .unwrap_or_else(|| "".to_string());
+                            let dir = flattened.parent().map(|p| p.to_string_lossy().to_string()).unwrap_or_else(|| "".to_string());
                             index_rel_dir = Some(dir);
                         } else if fname.eq_ignore_ascii_case("image.png") {
                             let rel = flattened.to_string_lossy().to_string();
@@ -129,14 +122,8 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                 }
             }
 
-            let Some(index_dir) = index_rel_dir else {
-                return Err(std::io::Error::other(
-                    "Zip file does not contain index.html",
-                ));
-            };
-            let Some(img_rel) = img_rel_path else {
-                return Err(std::io::Error::other("Zip file does not contain image.png"));
-            };
+            let Some(index_dir) = index_rel_dir else { return Err(std::io::Error::other("Zip file does not contain index.html")); };
+            let Some(img_rel) = img_rel_path else { return Err(std::io::Error::other("Zip file does not contain image.png")); };
 
             Ok((index_dir, img_rel))
         })
@@ -164,17 +151,11 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
             Ok(mut l) => match l.as_array_mut() {
                 Some(o) => {
                     if let Some(name) = game_data.get("name").and_then(|n| n.as_str()) {
-                        if let Some(old) = o
-                            .iter()
-                            .find(|g| g.get("name").and_then(|n| n.as_str()) == Some(name))
-                        {
+                        if let Some(old) = o.iter().find(|g| g.get("name").and_then(|n| n.as_str()) == Some(name)) {
                             if let Some(old_path) = old.get("path").and_then(|p| p.as_str()) {
                                 let abs_path = format!("{}{}", STATIC_DIR, old_path);
                                 if let Err(e) = std::fs::remove_dir_all(&abs_path) {
-                                    eprintln!(
-                                        "Failed to delete old game folder {}: {}",
-                                        abs_path, e
-                                    );
+                                    eprintln!("Failed to delete old game folder {}: {}", abs_path, e);
                                 }
                             }
                         }
@@ -213,10 +194,7 @@ async fn main() -> Result<(), std::io::Error> {
             .service(games_json)
             .service(add_game)
             .service(actix_files::Files::new("/", "./static").index_file("index.html"))
-            .service(
-                actix_files::Files::new("/play", format!("{}/play", STATIC_DIR))
-                    .index_file("index.html"),
-            )
+            .service(actix_files::Files::new("/play", format!("{}/play", STATIC_DIR)).index_file("index.html"))
     })
     .bind(("0.0.0.0", 8080))?
     .run()
