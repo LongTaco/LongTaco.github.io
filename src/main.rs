@@ -6,9 +6,9 @@ use rand::{Rng, distr::Alphanumeric};
 use serde_json::{Value, json};
 use tokio::io::AsyncWriteExt;
 
-const GAMES_FILE: &str = "/data/games.json";
-const UPLOADS_DIR: &str = "/data/uploads";
-const STATIC_DIR: &str = "/data/static";
+const GAMES_FILE: &str = "./data/games.json";
+const UPLOADS_DIR: &str = "./data/uploads";
+const STATIC_DIR: &str = "./data/static";
 
 #[actix_web::get("/games")]
 async fn games_json() -> impl Responder {
@@ -26,14 +26,15 @@ async fn games_json() -> impl Responder {
 
 #[actix_web::post("/games")]
 async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
-    // Collect metadata (JSON) and write uploaded file
     let mut meta: Option<Value> = None;
     let filename: String = rand::rng()
         .sample_iter(Alphanumeric)
         .take(10)
         .map(char::from)
         .collect();
-        let upload_path = format!("{}/{}.zip", UPLOADS_DIR, filename);    let mut file = match tokio::fs::File::create(&upload_path).await {
+
+    let upload_path = format!("{}/{}.zip", UPLOADS_DIR, filename);
+    let mut file = match tokio::fs::File::create(&upload_path).await {
         Ok(f) => f,
         Err(e) => {
             eprintln!("Failed to create upload file: {e}");
@@ -41,6 +42,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                 .json(json!({"error": "Failed to store upload"}));
         }
     };
+
     while let Some(Ok(mut field)) = payload.next().await {
         let name = field.name().unwrap_or("");
         if name == "file" {
@@ -67,11 +69,10 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                 }
             }
         } else {
-            // Drain any unexpected fields
             while let Some(Ok(_)) = field.next().await {}
         }
     }
-    // Ensure all bytes are flushed to disk before extracting
+
     if let Err(e) = file.flush().await {
         eprintln!("Error flushing uploaded file: {e}");
         return HttpResponse::InternalServerError()
@@ -79,37 +80,30 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
     }
     drop(file);
 
-    std::fs::create_dir_all(format!("{}/play/{filename}", STATIC_DIR)).unwrap();   
+    std::fs::create_dir_all(format!("{}/play/{filename}", STATIC_DIR)).unwrap();
 
-    // Extract the zip in a single blocking task to avoid lifetime issues
-    // Also detect where index.html and image.png live (root or single folder)
     let fname = filename.clone();
-
     let unzip_result =
         tokio::task::spawn_blocking(move || -> Result<(String, String), std::io::Error> {
             let f = std::fs::File::open(&upload_path)?;
             let mut zip =
                 zip::ZipArchive::new(f).map_err(|e| std::io::Error::other(e.to_string()))?;
 
-            // Track discovered locations inside the archive (relative paths)
-            let mut index_rel_dir: Option<String> = None; // e.g., "" or "GameFolder"
-            let mut img_rel_path: Option<String> = None; // e.g., "image.png" or "GameFolder/image.png"
+            let mut index_rel_dir: Option<String> = None;
+            let mut img_rel_path: Option<String> = None;
 
             for ind in 0..zip.len() {
                 let mut entry = zip
                     .by_index(ind)
                     .map_err(|e| std::io::Error::other(e.to_string()))?;
-
-                // Safe, sanitized archive path
                 let Some(rel_path) = entry.enclosed_name().map(|p| p.to_path_buf()) else {
                     continue;
                 };
-
-                // Remove the first path component to flatten top-level folders
                 let mut comps = rel_path.components();
                 let _ = comps.next();
                 let flattened: std::path::PathBuf = comps.collect();
                 let path = Path::new(&format!("{}/play/{filename}/", STATIC_DIR)).join(&flattened);
+
                 if entry.name().contains("__MACOSX") {
                 } else if entry.name().ends_with('/') {
                     std::fs::create_dir_all(path.display().to_string().trim_end_matches("/"))?;
@@ -120,10 +114,8 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                     let mut outfile = std::fs::File::create(&path)?;
                     std::io::copy(&mut entry, &mut outfile)?;
 
-                    // Detect important files relative to archive root
                     if let Some(fname) = flattened.file_name().and_then(|s| s.to_str()) {
                         if fname.eq_ignore_ascii_case("index.html") {
-                            // Save directory (may be empty if at root)
                             let dir = flattened
                                 .parent()
                                 .map(|p| p.to_string_lossy().to_string())
@@ -137,7 +129,6 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                 }
             }
 
-            // Validate we found required files
             let Some(index_dir) = index_rel_dir else {
                 return Err(std::io::Error::other(
                     "Zip file does not contain index.html",
@@ -151,8 +142,6 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
         })
         .await;
 
-    // Compute the final paths to store in metadata based on what we found
-    // Always flatten paths after extraction
     let base_web_path = format!("/play/{fname}/");
     let img_web_path = format!("/play/{fname}/image.png");
 
@@ -175,13 +164,17 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
             Ok(mut l) => match l.as_array_mut() {
                 Some(o) => {
                     if let Some(name) = game_data.get("name").and_then(|n| n.as_str()) {
-                        // Remove old metadata entries with the same name
-                        if let Some(old) = o.iter().find(|g| g.get("name").and_then(|n| n.as_str()) == Some(name)) {
+                        if let Some(old) = o
+                            .iter()
+                            .find(|g| g.get("name").and_then(|n| n.as_str()) == Some(name))
+                        {
                             if let Some(old_path) = old.get("path").and_then(|p| p.as_str()) {
-                                // Derive absolute folder path from old_path
                                 let abs_path = format!("{}{}", STATIC_DIR, old_path);
                                 if let Err(e) = std::fs::remove_dir_all(&abs_path) {
-                                    eprintln!("Failed to delete old game folder {}: {}", abs_path, e);
+                                    eprintln!(
+                                        "Failed to delete old game folder {}: {}",
+                                        abs_path, e
+                                    );
                                 }
                             }
                         }
@@ -213,19 +206,18 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
 async fn main() -> Result<(), std::io::Error> {
     tokio::fs::create_dir_all(UPLOADS_DIR).await?;
     tokio::fs::create_dir_all(STATIC_DIR).await?;
-    println!("Running on http://localhost:8080/");
+    println!("Running on http://0.0.0.0:8080/");
     HttpServer::new(move || {
         App::new()
-            // Raise payload limit for larger uploads (e.g., zip files)
             .app_data(web::PayloadConfig::default().limit(100 * 1024 * 1024))
             .service(games_json)
             .service(add_game)
             .service(actix_files::Files::new("/", "./static").index_file("index.html"))
             .service(
                 actix_files::Files::new("/play", format!("{}/play", STATIC_DIR))
-                     .index_file("index.html")
+                    .index_file("index.html"),
             )
-        })
+    })
     .bind(("0.0.0.0", 8080))?
     .run()
     .await
