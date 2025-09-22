@@ -6,13 +6,10 @@ use rand::{Rng, distr::Alphanumeric};
 use serde_json::{Value, json};
 use tokio::io::AsyncWriteExt;
 
-const GAMES_FILE: &str = "/data/games.json";
-const UPLOADS_DIR: &str = "/data/uploads";
-const STATIC_DIR: &str = "/data/static";
 
 #[actix_web::get("/games")]
 async fn games_json() -> impl Responder {
-    match tokio::fs::read_to_string(GAMES_FILE).await {
+    match tokio::fs::read_to_string("games.json").await {
         Ok(r) => match serde_json::from_str::<Value>(&r) {
             Ok(l) => serde_json::to_string(&l).unwrap_or("[]".to_string()),
             Err(_) => "[]".to_string(),
@@ -33,7 +30,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
         .take(10)
         .map(char::from)
         .collect();
-    let upload_path = format!("{UPLOADS_DIR}/{filename}.zip");
+    let upload_path = format!("./uploads/{filename}.zip");
     let mut file = match tokio::fs::File::create(&upload_path).await {
         Ok(f) => f,
         Err(e) => {
@@ -80,7 +77,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
     }
     drop(file);
 
-    std::fs::create_dir_all(format!("{}/play/{filename}", STATIC_DIR)).unwrap();
+    std::fs::create_dir_all(format!("{}/play/{filename}", "./static")).unwrap();
 
     // Extract the zip in a single blocking task to avoid lifetime issues
     // Also detect where index.html and image.png live (root or single folder)
@@ -110,7 +107,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                 let mut comps = rel_path.components();
                 let _ = comps.next();
                 let flattened: std::path::PathBuf = comps.collect();
-                let path = Path::new(&format!("{}/play/{filename}/", STATIC_DIR)).join(&flattened);
+                let path = Path::new(&format!("{}/play/{filename}/", "./static")).join(&flattened);
                 if entry.name().contains("__MACOSX") {
                 } else if entry.name().ends_with('/') {
                     std::fs::create_dir_all(path.display().to_string().trim_end_matches("/"))?;
@@ -171,7 +168,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
         None => json!({}),
     };
 
-    let games = match tokio::fs::read_to_string(GAMES_FILE).await {
+    let games = match tokio::fs::read_to_string("./games.json").await {
         Ok(r) => match serde_json::from_str::<Value>(&r) {
             Ok(mut l) => match l.as_array_mut() {
                 Some(o) => {
@@ -183,7 +180,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
                         {
                             if let Some(old_path) = old.get("path").and_then(|p| p.as_str()) {
                                 // Derive absolute folder path from old_path
-                                let abs_path = format!("{}{}", STATIC_DIR, old_path);
+                                let abs_path = format!("{}{}", "./static", old_path);
                                 if let Err(e) = std::fs::remove_dir_all(&abs_path) {
                                     eprintln!(
                                         "Failed to delete old game folder {}: {}",
@@ -207,7 +204,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
         }
     };
 
-    match tokio::fs::write(GAMES_FILE, serde_json::to_string(&games).unwrap()).await {
+    match tokio::fs::write("games.json", serde_json::to_string(&games).unwrap()).await {
         Ok(_) => {}
         Err(e) => {
             eprintln!("Error writing to games file: {e}");
@@ -218,9 +215,7 @@ async fn add_game(mut payload: actix_multipart::Multipart) -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
-    tokio::fs::create_dir_all(UPLOADS_DIR).await?;
-    tokio::fs::create_dir_all(STATIC_DIR).await?;
-    println!("Running on http://localhost:8080/");
+    println!("Running on http://localhost:80/");
     HttpServer::new(move || {
         App::new()
             // Raise payload limit for larger uploads (e.g., zip files)
@@ -228,9 +223,8 @@ async fn main() -> Result<(), std::io::Error> {
             .service(games_json)
             .service(add_game)
             .service(actix_files::Files::new("/", "./static").index_file("index.html"))
-            .service(actix_files::Files::new("/play", STATIC_DIR).index_file("index.html"))
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", 80))?
     .run()
     .await
 }
