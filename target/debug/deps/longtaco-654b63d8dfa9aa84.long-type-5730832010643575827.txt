@@ -1,2 +1,0 @@
-fn(std::string::String, actix_multipart::Multipart) -> impl futures_util::Future<Output = impl actix_web::Responder> {add_game}
-fn(std::string::String, actix_multipart::Multipart) -> impl futures_util::Future<Output = impl actix_web::Responder> {add_game}: actix_web::dev::HttpServiceFactory

@@ -184,7 +184,6 @@ async fn main() -> Result<(), std::io::Error> {
     println!("Running on http://localhost:80/");
     HttpServer::new(move || {
         App::new()
-            .app_data(web::PayloadConfig::default().limit(100 * 1024 * 1024))
             .service(games_json)
             .service(add_game)
             .service(actix_files::Files::new("/", "./static").index_file("index.html"))
